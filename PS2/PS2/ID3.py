@@ -94,6 +94,7 @@ def prune(node, examples):
   to improve accuracy on the validation data; the precise pruning strategy is up to you.
   '''
 
+
 def test(node, examples):
   '''
   Takes in a trained tree and a test set of examples.  Returns the accuracy (fraction
@@ -113,12 +114,17 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
+	#attribute the tree splits over
 	attribute = node.label
-	if(attribute == "Class"):
+	
+	#if bottom of tree, return predicted Class
+	if not node.children():
 		return attribute
 	
+	# get response for attribute to split over
 	response = example[attribute]
 	
+	#recurse til end of tree
 	return evaluate(node.children[response],example)
 
 # finds the best attribute based on infoGain
