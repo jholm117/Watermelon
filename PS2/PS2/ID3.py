@@ -9,61 +9,52 @@ def ID3(examples, default):
   Any missing attributes are denoted with a value of "?"
   '''
 
-
+  
 #if examples empty 
 	if not examples:
 		return default
 
-	#set up refernces to first example
+	#set up refernces to first congressman
 	firstPerson = examples[0]
-	Class = firstPerson["Class"]
+	affiliation = firstPerson["Class"]
 	AllSameClass = True
 	
 	AllSameAttVector = True	
 	AttributeVector = firstPerson.values()
 	AttributeVector.remove(firstPerson["Class"])
 	
-	# counts is a dictionary that holds the number of each Class
-	ClassCounts = {}
-	
-	for example in examples:
+	for congressman in examples:
 		
-		#if Class of current iteration is different from last
-		if(AllSameClass and example["Class"] != Class):
+		#if affiliation of current iteration is different from last
+		if(AllSameClass and congressman["Class"] != affiliation):
 			AllSameClass = False
 			
 		#if attribute vectors have all been the same so far
 		if(AllSameAttVector):
 			
 			#attribute vector is dict.values without Class value
-			currentAttributeVector = example.values()
-			currentAttributeVector.remove(example["Class"])
-			
-			#if attribute vector differs
-			commonPairs = AttributeVector.items() & currentAttributeVector.items()
-			if(commonPairs.len() =! AttributeVector.len()):					
+			currentAttributeVector = congressman.values()
+			currentAttributeVector.remove(congressman["Class"])
+
+			#if attribute vector differs			
+			if(AttributeVector != currentAttributeVector):				
 				AllSameAttVector = False
 			
-		# increase count of each Class
-		if example["Class"] in ClassCounts:
-			ClassCounts[value] += 1
+		# increase appropriate counters	
+		if(congressman["Class"] == "democrat"):
+			demos+=1
 		else:
-			ClassCounts[value] = 1
-
+			repubs+=1		
 		
-		
-		
-				
-	max =0
-	#Set MODE to highest occurence of Class attribute
-	for key in ClassCounts
-		if ClassCounts[key] > max:
-			MODE = key
-			max = ClassCounts[key]
+	#MODE
+	if(demos >= repubs):
+			MODE = "demos"
+		else:
+			MODE = "republican"
 	
 #if examples all the same classification return it			
 	if(AllSameClass):
-		return Class
+		return affiliation
 
 	
 #if all examples have the same attribute vector return most common class
@@ -74,16 +65,17 @@ def ID3(examples, default):
 		best = ChooseAttribute()
 		
 		#decision tree with best as root
-		tree = Node()		
+		tree = Node()
 		
-		for v in ClassCounts :
+		indieVariables = ["y","n","?"]
+		for v in indieVariables :
 			#elements of examples with best = v
 			examples1 = []
-			for example in examples:
+			for congressman in examples:
 			
-				#if the example had the same response as v add them to examples1
-				if (example[best] == v):
-					examples1.append(example)
+				#if the congressman had the same response as v add them to examples1
+				if (congressman[best] == v):
+					examples1.append(congressman)
 			
 			subtree = ID3(examples1, MODE)
 			
@@ -119,10 +111,20 @@ def evaluate(node, example):
   assigns to the example.
   '''
 
+# finds the best attribute based on infoGain
+def ChooseAttribute(examples):
+	best = (1000000000, None)
+	for xi in examples[0]:
+		if xi != "Class":
+			ig = infoGain(xi, examples)
+			if (ig < best[0]):
+				best = (ig, xi)
 
+	return best[1]
+
+
+# returns purity of xi
 def infoGain(xi, examples):
-	# returns purity of xi
-
 	result = 0
 	
 	# values is an array of the values of xi from each example
@@ -132,10 +134,11 @@ def infoGain(xi, examples):
 	# counts is a dictionary that holds the number of each result
 	counts = {}
 	for value in values:
-		if value in counts:
-			counts[value] += 1
-		else:
-			counts[value] = 1
+		if value != "Class":
+			if value in counts:
+				counts[value] += 1
+			else:
+				counts[value] = 1
 
 	# info gain
 	for key in counts:
