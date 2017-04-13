@@ -11,7 +11,9 @@ def ID3(examples, default):
 
 	#if examples empty 
 	if not examples:
-		return default
+		ret = Node()
+		ret.label = default
+		return ret
 
 	#set up refernces to first example
 	firstPerson = examples[0]
