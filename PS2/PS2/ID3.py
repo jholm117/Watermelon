@@ -62,13 +62,18 @@ def ID3(examples, default):
 		return MODE
 			
 	else:
+		#attribute to split over
 		best = ChooseAttribute()
 		
 		#decision tree with best as root
 		tree = Node()
+		tree.label = best
 		
+		#need to change this to work for general case
 		indieVariables = ["y","n","?"]
+		
 		for v in indieVariables :
+		
 			#elements of examples with best = v
 			examples1 = []
 			for congressman in examples:
@@ -79,7 +84,7 @@ def ID3(examples, default):
 			
 			subtree = ID3(examples1, MODE)
 			
-			# add sub tree to root?
+			# add sub tree to root with v=key indicating branch to node of new attribute 
 			tree.children[v] = subtree
 			
 		return tree
@@ -102,3 +107,4 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
+	if 
