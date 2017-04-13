@@ -118,7 +118,7 @@ def evaluate(node, example):
 	attribute = node.label
 	
 	#if bottom of tree, return predicted Class
-	if not node.children():
+	if not node.children:
 		return attribute
 	
 	# get response for attribute to split over
