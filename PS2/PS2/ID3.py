@@ -41,7 +41,7 @@ def ID3(examples, default):
 				AllSameAttVector = False
 			
 		# increase appropriate counters	
-		if(congressman["Class"] == "democrat":
+		if(congressman["Class"] == "democrat"):
 			demos+=1
 		else:
 			repubs+=1		
@@ -62,18 +62,13 @@ def ID3(examples, default):
 		return MODE
 			
 	else:
-		#attribute to split over
 		best = ChooseAttribute()
 		
 		#decision tree with best as root
 		tree = Node()
-		tree.label = best
 		
-		#need to change this to work for general case
 		indieVariables = ["y","n","?"]
-		
 		for v in indieVariables :
-		
 			#elements of examples with best = v
 			examples1 = []
 			for congressman in examples:
@@ -84,10 +79,11 @@ def ID3(examples, default):
 			
 			subtree = ID3(examples1, MODE)
 			
-			# add sub tree to root with v=key indicating branch to node of new attribute 
+			# add sub tree to root?
 			tree.children[v] = subtree
 			
 		return tree
+	
 
 def prune(node, examples):
   '''
@@ -100,6 +96,13 @@ def test(node, examples):
   Takes in a trained tree and a test set of examples.  Returns the accuracy (fraction
   of examples the tree classifies correctly).
   '''
+  num_correct = 0
+  total_num = len(examples)
+  for example in examples:
+  	result = evaluate(node, example)
+  	num_correct += (result == example[Class])
+
+  return num_correct/total_num
 
 
 def evaluate(node, example):
@@ -107,4 +110,29 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
-	if 
+
+
+def infoGain(xi, examples):
+	# returns purity of xi
+
+	result = 0
+	
+	# values is an array of the values of xi from each example
+	values = [example[xi] for example in examples]
+	total_num = len(values)
+
+	# counts is a dictionary that holds the number of each result
+	counts = {}
+	for value in values:
+		if value in counts:
+			counts[value] += 1
+		else:
+			counts[value] = 1
+
+	# info gain
+	for key in counts:
+		p = counts[key]/total_num
+		e = p*math.log(p, 2)
+		result -= p * e
+
+	return result
