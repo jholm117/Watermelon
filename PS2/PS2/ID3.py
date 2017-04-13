@@ -9,73 +9,77 @@ def ID3(examples, default):
   Any missing attributes are denoted with a value of "?"
   '''
 
-  
-#if examples empty 
+	#if examples empty 
 	if not examples:
 		return default
 
-	#set up refernces to first congressman
+	#set up refernces to first example
 	firstPerson = examples[0]
-	affiliation = firstPerson["Class"]
+	Class = firstPerson["Class"]
 	AllSameClass = True
 	
 	AllSameAttVector = True	
 	AttributeVector = firstPerson.values()
 	AttributeVector.remove(firstPerson["Class"])
 	
-	for congressman in examples:
+	# counts is a dictionary that holds the number of each Class
+	ClassCounts = {}
+	
+	for example in examples:
 		
-		#if affiliation of current iteration is different from last
-		if(AllSameClass and congressman["Class"] != affiliation):
+		#if Class of current iteration is different from last
+		if(AllSameClass and example["Class"] != Class):
 			AllSameClass = False
 			
 		#if attribute vectors have all been the same so far
 		if(AllSameAttVector):
 			
 			#attribute vector is dict.values without Class value
-			currentAttributeVector = congressman.values()
-			currentAttributeVector.remove(congressman["Class"])
-
-			#if attribute vector differs			
-			if(AttributeVector != currentAttributeVector):				
+			currentAttributeVector = example.values()
+			currentAttributeVector.remove(example["Class"])
+			
+			#if attribute vector differs
+			commonPairs = AttributeVector.items() & currentAttributeVector.items()
+			if(commonPairs.len() =! AttributeVector.len()):					
 				AllSameAttVector = False
 			
-		# increase appropriate counters	
-		if(congressman["Class"] == "democrat"):
-			demos+=1
+		# increase count of each Class
+		if example["Class"] in ClassCounts:
+			ClassCounts[value] += 1
 		else:
-			repubs+=1		
-		
-	#MODE
-	if(demos >= repubs):
-			MODE = "demos"
-		else:
-			MODE = "republican"
+			ClassCounts[value] = 1	
+				
+
+	max =0
+	#Set MODE to highest occurence of Class attribute
+	for key in ClassCounts
+		if ClassCounts[key] > max:
+			MODE = key
+			max = ClassCounts[key]
 	
-#if examples all the same classification return it			
+	#if examples all the same classification return it			
 	if(AllSameClass):
-		return affiliation
+		return Class
 
 	
-#if all examples have the same attribute vector return most common class
+	#if all examples have the same attribute vector return most common class
 	elif(AllSameAttVector):
 		return MODE
 			
 	else:
-		best = ChooseAttribute()
+		best = ChooseAttribute(examples)
 		
 		#decision tree with best as root
-		tree = Node()
+		tree = Node()		
 		
-		indieVariables = ["y","n","?"]
-		for v in indieVariables :
+		for v in ClassCounts :
 			#elements of examples with best = v
 			examples1 = []
-			for congressman in examples:
+			for example in examples:
 			
-				#if the congressman had the same response as v add them to examples1
-				if (congressman[best] == v):
-					examples1.append(congressman)
+				#if the example had the same response as v add them to examples1
+				if (example[best] == v):
+					examples1.append(example)
 			
 			subtree = ID3(examples1, MODE)
 			
