@@ -16,11 +16,11 @@ def ID3(examples, default):
 	#set up refernces to first example
 	firstPerson = examples[0]
 	Class = firstPerson["Class"]
-	AllSameClass = True
+	allSameClass = True
 	
-	AllSameAttVector = True	
-	AttributeVector = firstPerson.values()
-	AttributeVector.remove(firstPerson["Class"])
+	allSameAttVector = True	
+	attributeVector = firstPerson.values()
+	attributeVector.remove(firstPerson["Class"])
 	
 	# counts is a dictionary that holds the number of each Class
 	ClassCounts = {}
@@ -28,43 +28,42 @@ def ID3(examples, default):
 	for example in examples:
 		
 		#if Class of current iteration is different from last
-		if(AllSameClass and example["Class"] != Class):
-			AllSameClass = False
+		if(allSameClass and example["Class"] != Class):
+			allSameClass = False
 			
 		#if attribute vectors have all been the same so far
-		if(AllSameAttVector):
+		if(allSameAttVector):
 			
 			#attribute vector is dict.values without Class value
 			currentAttributeVector = example.values()
 			currentAttributeVector.remove(example["Class"])
 			
 			#if attribute vector differs
-			commonPairs = AttributeVector.items() & currentAttributeVector.items()
-			if(commonPairs.len() =! AttributeVector.len()):					
-				AllSameAttVector = False
+			commonPairs = attributeVector.items() & currentAttributeVector.items()
+			if(commonPairs.len() != attributeVector.len()):					
+				allSameAttVector = False
 			
 		# increase count of each Class
 		if example["Class"] in ClassCounts:
-			ClassCounts[value] += 1
+			ClassCounts[example["Class"]] += 1
 		else:
-			ClassCounts[value] = 1	
+			ClassCounts[example["Class"]] = 1	
 				
 
 	max =0
-	#Set MODE to highest occurence of Class attribute
-	for key in ClassCounts
+	#Set mode to highest occurence of Class attribute
+	for key in ClassCounts:
 		if ClassCounts[key] > max:
-			MODE = key
+			mode = key
 			max = ClassCounts[key]
 	
 	#if examples all the same classification return it			
-	if(AllSameClass):
+	if(allSameClass):
 		return Class
 
-	
 	#if all examples have the same attribute vector return most common class
-	elif(AllSameAttVector):
-		return MODE
+	elif(allSameAttVector):
+		return mode
 			
 	else:
 		best = ChooseAttribute(examples)
@@ -73,7 +72,7 @@ def ID3(examples, default):
 		tree = Node()		
 		
 		for v in ClassCounts :
-			#elements of examples with best = v
+			#elements of examples with best = value
 			examples1 = []
 			for example in examples:
 			
@@ -81,7 +80,7 @@ def ID3(examples, default):
 				if (example[best] == v):
 					examples1.append(example)
 			
-			subtree = ID3(examples1, MODE)
+			subtree = ID3(examples1, mode)
 			
 			# add sub tree to root?
 			tree.children[v] = subtree
