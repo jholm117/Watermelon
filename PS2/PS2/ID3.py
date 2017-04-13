@@ -113,6 +113,13 @@ def evaluate(node, example):
   Takes in a tree and one example.  Returns the Class value that the tree
   assigns to the example.
   '''
+	attribute = node.label
+	if(attribute == "Class"):
+		return attribute
+	
+	response = example[attribute]
+	
+	return evaluate(node.children[response],example)
 
 # finds the best attribute based on infoGain
 def ChooseAttribute(examples):
