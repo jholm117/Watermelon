@@ -61,11 +61,15 @@ def ID3(examples, default):
 	
 	#if examples all the same classification return it			
 	if(allSameClass):
-		return Class
+		ret = Node()
+		ret.label = Class
+		return ret
 
 	#if all examples have the same attribute vector return most common class
 	elif(allSameAttVector):
-		return mode
+		ret = Node()
+		ret.label = mode
+		return ret
 			
 	else:
 		best = ChooseAttribute(examples)
