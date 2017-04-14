@@ -114,7 +114,7 @@ def prune(node, examples):
 		#if the child is not a leaf
 		if masterTree[child].children:
 			#copy masterTree to test pruned tree 
-			prunedTree = masterTree
+			prunedTree = masterTree.copy()
 			
 			#make child a leaf
 			prunedTree[child].children = {}
