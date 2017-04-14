@@ -95,12 +95,45 @@ def ID3(examples, default):
 	
 
 def prune(node, examples):
-  '''
-  Takes in a trained tree and a validation set of examples.  Prunes nodes in order
-  to improve accuracy on the validation data; the precise pruning strategy is up to you.
-  '''
+	'''
+	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
+	to improve accuracy on the validation data; the precise pruning strategy is up to you.
+	'''
+	#Reduced Error Pruning Implementation
+	
+	#recursion end case: if leaf return 
+	if not node.children:
+		return node
+
+	masterTree = node
+	masterTreeAccuracy = test(node,examples)
 
 
+	for child in masterTree.children:
+
+		#if the child is not a leaf
+		if masterTree[child].children:
+			#copy masterTree to test pruned tree 
+			prunedTree = masterTree
+			
+			#make child a leaf
+			prunedTree[child].children = {}
+			
+			#test accuracy
+			prunedAccuracy = test(prunedTree,examples)
+			
+			#update master tree if pruned tree is more accurate
+			if(prunedAccuracy > masterTreeAccuracy):
+				masterTree = prunedTree
+				masterTreeAccuracy = prunedAccuracy
+			
+		#run prune on child
+		masterTree.children[child] = prune(masterTree.children[child],examples)
+	
+	#return final pruned tree
+	return masterTree
+
+	
 def test(node, examples):
   '''
   Takes in a trained tree and a test set of examples.  Returns the accuracy (fraction
