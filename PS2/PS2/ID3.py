@@ -91,7 +91,7 @@ def ID3(examples, default):
  	return tree
 
 
-def prune(masterTree, examples):
+def prune(originalTree, examples):
 	'''
 	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
 	to improve accuracy on the validation data; the precise pruning strategy is up to you.
@@ -99,38 +99,26 @@ def prune(masterTree, examples):
 	#Reduced Error Pruning Implementation
 	
 	#recursion end case: if leaf return 
-	if not masterTree.children:
-		return masterTree
-
-
-	masterTreeAccuracy = test(masterTree,examples)
-
-
-	for childKey in masterTree.children:
-
-		#if the childKey is not a leaf
-		if masterTree.children[childKey].children:
-			#copy masterTree to test pruned tree 
-			prunedTree = copy.deepcopy(masterTree)
-			
-			#make child a leaf
-			child = prunedTree.children[childKey]
-			child.label = getModeClass(child)
-			child.children = {}
-			
-			#test accuracy
-			prunedAccuracy = test(prunedTree,examples)
-			
-			#update master tree if pruned tree is more accurate
-			if(prunedAccuracy > masterTreeAccuracy):
-				masterTree = prunedTree
-				masterTreeAccuracy = prunedAccuracy
-			
-		#run prune on childKey
-		masterTree.children[childKey] = prune(masterTree.children[childKey],examples)
+	if not originalTree.children:
+		return originalTree
 	
-	#return final pruned tree
-	return masterTree
+	for childKey in originalTree.children
+		originalTree.children[childKey] = prune(originalTree.children[childKey],examples)
+	
+	 
+	prunedTree = copy.deepcopy(originalTree)
+	
+	#make prunedTree a leaf
+	prunedTree.label = getModeClass(prunedTree)
+	prunedTree.children = {}
+	
+
+	#if pruned tree is more accurate than original -> return it
+	if(test(prunedTree, examples) > test(originalTree,examples))
+		return prunedTree		
+	
+	#else return original tree
+	return originalTree
 
 def getModeClass(node):
 	if not node.children:
