@@ -142,7 +142,7 @@ def test(node, examples):
     result = evaluate(node, example)
     num_correct += (result == example[Class])
 
-  return num_correct/total_num
+  return float(num_correct)/total_num
 
 
 def evaluate(node, example):
@@ -194,7 +194,7 @@ def infoGain(xi, examples):
 
     # info gain
     for key in counts:
-        p = counts[key]/total_num
+        p = float(counts[key])/total_num
         e = p*math.log(p, 2)
         result -= p * e
 
