@@ -1,5 +1,5 @@
 from node import Node
-import math
+import math, copy
 
 def ID3(examples, default):
  	# if examples are empty, return a Node with label default
@@ -68,6 +68,7 @@ def ID3(examples, default):
  	#decision tree with best as root
  	tree = Node()
  	tree.label = best
+ 	tree.modeResponse = getModeResponse(examples, best)
 
  	# bestVals has a key for each value of best
  	# and holds examples where example[best] = key
@@ -77,10 +78,10 @@ def ID3(examples, default):
  		currentExample = example.copy()
  		if currentExample[best] not in bestVals:
  			currentExample.pop(best)
- 			bestVals[best] = [currentExample]
+ 			bestVals[example[best]] = [currentExample]
  		else:
  			currentExample.pop(best)
- 			bestVals[best].append(currentExample)
+ 			bestVals[example[best]].append(currentExample)
 
  	# add a child to root for each value of best
  	for val in bestVals:
@@ -108,12 +109,12 @@ def prune(masterTree, examples):
 	for childKey in masterTree.children:
 
 		#if the childKey is not a leaf
-		if masterTree[childKey].children:
+		if masterTree.children[childKey].children:
 			#copy masterTree to test pruned tree 
-			prunedTree = masterTree.copy()
+			prunedTree = copy.deepcopy(masterTree)
 			
 			#make child a leaf
-			child = prunedTree[childKey]
+			child = prunedTree.children[childKey]
 			child.label = getModeClass(child)
 			child.children = {}
 			
@@ -131,8 +132,8 @@ def prune(masterTree, examples):
 	#return final pruned tree
 	return masterTree
 
-def getModeClass(node)
-	if not node.children
+def getModeClass(node):
+	if not node.children:
 		return node.label
 	return getModeClass(node.children[node.modeResponse])
 
@@ -147,7 +148,7 @@ def test(node, examples):
 
   for example in examples:
     result = evaluate(node, example)
-    num_correct += (result == example[Class])
+    num_correct += (result == example["Class"])
 
   return float(num_correct)/total_num
 
@@ -166,6 +167,9 @@ def evaluate(node, example):
 
     # get response for attribute to split over
     response = example[attribute]
+
+    if response not in node.children:
+    	return evaluate(node.children[node.modeResponse], example)
 
     #recurse til end of tree
     return evaluate(node.children[response],example)
@@ -207,4 +211,22 @@ def infoGain(xi, examples):
 
     return result
 
+# Gets the mode of responses to a given attribute
+def getModeResponse(examples,attribute):
+	# counts is a dictionary that holds the number of each result
+    counts = {}
+    for example in examples:
+    	if example[attribute] not in counts:
+    		counts[example[attribute]] = 1
+    	else:
+    		counts[example[attribute]] += 1
 
+    mode = None
+    max = 0
+
+    for key in counts:
+    	if counts[key] > max:
+    		max = counts[key]
+    		mode = key
+
+    return mode
