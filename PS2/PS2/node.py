@@ -3,4 +3,3 @@ class Node:
     self.label = None
     self.children = {}
 	self.modeResponse = None
-	# you may want to add additional fields here...
