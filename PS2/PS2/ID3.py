@@ -94,7 +94,7 @@ def ID3(examples, default):
 		return tree
 	
 
-def prune(node, examples):
+def prune(masterTree, examples):
 	'''
 	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
 	to improve accuracy on the validation data; the precise pruning strategy is up to you.
@@ -102,11 +102,11 @@ def prune(node, examples):
 	#Reduced Error Pruning Implementation
 	
 	#recursion end case: if leaf return 
-	if not node.children:
-		return node
+	if not masterTree.children:
+		return masterTree
 
-	masterTree = node
-	masterTreeAccuracy = test(node,examples)
+
+	masterTreeAccuracy = test(masterTree,examples)
 
 
 	for child in masterTree.children:
