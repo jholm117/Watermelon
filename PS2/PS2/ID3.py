@@ -105,15 +105,17 @@ def prune(masterTree, examples):
 	masterTreeAccuracy = test(masterTree,examples)
 
 
-	for child in masterTree.children:
+	for childKey in masterTree.children:
 
-		#if the child is not a leaf
-		if masterTree[child].children:
+		#if the childKey is not a leaf
+		if masterTree[childKey].children:
 			#copy masterTree to test pruned tree 
 			prunedTree = masterTree.copy()
 			
 			#make child a leaf
-			prunedTree[child].children = {}
+			child = prunedTree[childKey]
+			child.label = getModeClass(child)
+			child.children = {}
 			
 			#test accuracy
 			prunedAccuracy = test(prunedTree,examples)
@@ -123,11 +125,16 @@ def prune(masterTree, examples):
 				masterTree = prunedTree
 				masterTreeAccuracy = prunedAccuracy
 			
-		#run prune on child
-		masterTree.children[child] = prune(masterTree.children[child],examples)
+		#run prune on childKey
+		masterTree.children[childKey] = prune(masterTree.children[childKey],examples)
 	
 	#return final pruned tree
 	return masterTree
+
+def getModeClass(node)
+	if not node.children
+		return node.label
+	return getModeClass(node.children[node.modeResponse])
 
 	
 def test(node, examples):
