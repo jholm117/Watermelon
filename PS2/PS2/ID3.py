@@ -2,7 +2,12 @@ from node import Node
 import math, copy
 
 def ID3(examples, default):
- 	# if examples are empty, return a Node with label default
+ 	tree = ID3recurse(examples,default)
+	tree = markRoot(tree,tree)
+	return tree
+	
+def ID3recurse(examples,default):
+# if examples are empty, return a Node with label default
  	if not examples:
  		ret = Node()
  		ret.label = default
@@ -89,41 +94,76 @@ def ID3(examples, default):
  		tree.children[val] = subtree
 
  	return tree
+	
+def markRoot(tree,root):
+	tree.root = root
+	if not tree.children:
+		return tree
+	for childKey in tree.children:
+		markRoot(tree.children[childKey],root)
+	return tree
 
-
-def prune(originalTree, examples):
+def prune(node, examples):
 	'''
 	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
 	to improve accuracy on the validation data; the precise pruning strategy is up to you.
 	'''
 	#Reduced Error Pruning Implementation
 	
-	#recursion end case: if leaf return 
-	if not originalTree.children:
-		return originalTree
+	#if current node is a leaf return it
+	if not node.children:
+		return node
+	#depth first
+	for childKey in node.children:
+		node.children[childKey] = prune(node.children[childKey],examples)
 	
-	for childKey in originalTree.children
-		originalTree.children[childKey] = prune(originalTree.children[childKey],examples)
+	originalAccuracy = test(node.root,examples)
 	
-	 
-	prunedTree = copy.deepcopy(originalTree)
+	#original node
+	originalNode = copy.deepcopy(node)
+	#make node a leaf
+	node.label = getModeNode(node)
+	node.children = {}
 	
-	#make prunedTree a leaf
-	prunedTree.label = getModeClass(prunedTree)
-	prunedTree.children = {}
 	
+	#if the prunedTree is more accurate than the master tree return the pruned node
+	if(test(node.root, examples) > originalAccuracy):
+		return node
+		
+	#else dont prune
+	return originalNode
+	
+	#return pruneRecurse(node, node, examples)
+	
+def pruneRecurse(root, node, examples):
+	#if current node is a leaf return it
+	if not node.children:
+		return node
+	#depth first
+	for childKey in node.children:
+		node.children[childKey] = pruneRecurse(root,node.children[childKey],examples)
+	
+	#copy master tree and reassign data so that node is in prunedtree
+	temp = copy.deepcopy(root)
+	prunedTree = root
+	root = temp
+	
+	#original node
+	originalNode = copy.deepcopy(node)
+	#make node a leaf
+	node = getModeNode(node)
+	
+	#if the prunedTree is more accurate than the master tree return the pruned node
+	if(test(prunedTree, examples) > test(root, examples)):
+		return node
+		
+	#else dont prune
+	return originalNode
 
-	#if pruned tree is more accurate than original -> return it
-	if(test(prunedTree, examples) > test(originalTree,examples))
-		return prunedTree		
-	
-	#else return original tree
-	return originalTree
-
-def getModeClass(node):
+def getModeNode(node):
 	if not node.children:
 		return node.label
-	return getModeClass(node.children[node.modeResponse])
+	return getModeNode(node.children[node.modeResponse])
 
 	
 def test(node, examples):
