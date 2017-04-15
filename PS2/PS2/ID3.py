@@ -113,6 +113,7 @@ def prune(node, examples):
 	#if current node is a leaf return it
 	if not node.children:
 		return node
+	
 	#depth first
 	for childKey in node.children:
 		node.children[childKey] = prune(node.children[childKey],examples)
@@ -120,18 +121,23 @@ def prune(node, examples):
 	originalAccuracy = test(node.root,examples)
 	
 	#original node
-	originalNode = copy.deepcopy(node)
+	label = node.label	
+	children = node.children
+	
+	
 	#make node a leaf
 	node.label = getModeNode(node)
-	node.children = {}
+	emptyDict = {}
+	node.children = emptyDict
 	
 	
-	#if the prunedTree is more accurate than the master tree return the pruned node
-	if(test(node.root, examples) > originalAccuracy):
-		return node
-		
-	#else dont prune
-	return originalNode
+	#if the prunedTree is less accurate than the master tree restore children
+	if(test(node.root, examples) < originalAccuracy):		
+		node.label = label
+		node.children = children
+			
+	#else return pruned node
+	return node
 	
 	#return pruneRecurse(node, node, examples)
 	
