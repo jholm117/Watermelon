@@ -1,12 +1,7 @@
 from node import Node
 import math, copy
-
-def ID3(examples, default):
- 	tree = ID3recurse(examples,default)
-	tree = markRoot(tree,tree)
-	return tree
 	
-def ID3recurse(examples,default):
+def ID3(examples,default):
 # if examples are empty, return a Node with label default
  	if not examples:
  		ret = Node()
@@ -108,64 +103,42 @@ def prune(node, examples):
 	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
 	to improve accuracy on the validation data; the precise pruning strategy is up to you.
 	'''
+	pruneRecurse(node,node,examples)
+	return
+	
+	
+	
+def pruneRecurse(root, node, examples):
 	#Reduced Error Pruning Implementation
 	
 	#if current node is a leaf return it
 	if not node.children:
 		return node
 	
-	#depth first
+	#prune children first
 	for childKey in node.children:
-		node.children[childKey] = prune(node.children[childKey],examples)
+		node.children[childKey] = pruneRecurse(root,node.children[childKey],examples)
 	
-	originalAccuracy = test(node.root,examples)
+	originalAccuracy = test(root,examples)
 	
-	#original node
+	#cache label and children
 	label = node.label	
 	children = node.children
 	
 	
 	#make node a leaf
 	node.label = getModeNode(node)
-	emptyDict = {}
-	node.children = emptyDict
+	node.children = {}
 	
 	
 	#if the prunedTree is less accurate than the master tree restore children
-	if(test(node.root, examples) < originalAccuracy):		
+	if(test(root, examples) < originalAccuracy):		
 		node.label = label
 		node.children = children
 			
 	#else return pruned node
 	return node
 	
-	#return pruneRecurse(node, node, examples)
-	
-def pruneRecurse(root, node, examples):
-	#if current node is a leaf return it
-	if not node.children:
-		return node
-	#depth first
-	for childKey in node.children:
-		node.children[childKey] = pruneRecurse(root,node.children[childKey],examples)
-	
-	#copy master tree and reassign data so that node is in prunedtree
-	temp = copy.deepcopy(root)
-	prunedTree = root
-	root = temp
-	
-	#original node
-	originalNode = copy.deepcopy(node)
-	#make node a leaf
-	node = getModeNode(node)
-	
-	#if the prunedTree is more accurate than the master tree return the pruned node
-	if(test(prunedTree, examples) > test(root, examples)):
-		return node
-		
-	#else dont prune
-	return originalNode
-
 def getModeNode(node):
 	if not node.children:
 		return node.label
@@ -178,13 +151,12 @@ def test(node, examples):
   of examples the tree classifies correctly).
   '''
   num_correct = 0
-  total_num = len(examples)
-
+  
   for example in examples:
     result = evaluate(node, example)
     num_correct += (result == example["Class"])
 
-  return float(num_correct)/total_num
+  return float(num_correct)/len(examples)
 
 
 def evaluate(node, example):

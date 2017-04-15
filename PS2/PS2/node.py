@@ -3,4 +3,3 @@ class Node:
 	self.label = None
 	self.children = {}
 	self.modeResponse = None
-	self.root = None
