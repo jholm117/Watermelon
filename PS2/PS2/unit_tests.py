@@ -1,4 +1,5 @@
 import ID3, parse, random
+import matplotlib.pyplot as plt
 
 def testID3AndEvaluate():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1)]
@@ -16,7 +17,10 @@ def testPruning():
   data = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1), dict(a=0, b=1, Class=0), dict(a=0, b=0, Class=1)]
   validationData = [dict(a=1, b=0, Class=1), dict(a=1, b=1, Class=1), dict(a=0, b=0, Class=0), dict(a=0, b=0, Class=0)]
   tree = ID3.ID3(data, 0)
+
+
   ID3.prune(tree, validationData)
+
   if tree != None:
     ans = ID3.evaluate(tree, dict(a=0, b=0))
     if ans != 0:
@@ -29,8 +33,10 @@ def testPruning():
 def testPruning2():
   data = [dict(a=1, b=0, Class=0), dict(a=1, b=1, Class=0), dict(a=0, b=1, Class=1)]
   validationData = [dict(a=1, b=0, Class=0), dict(a=1, b=1, Class=0), dict(a=0, b=0, Class=0), dict(a=0, b=0, Class=0)]
-  tree = ID3.ID3(data, 0)
+  tree = ID3.ID3(data, 0)  
+
   ID3.prune(tree, validationData)
+
   if tree != None:
     ans = ID3.evaluate(tree, dict(a=0, b=0))
     if ans != 0:
@@ -68,6 +74,43 @@ def testID3AndTest():
     print "testID3andTest failed -- no tree returned."
 
 # inFile - string location of the house data file
+def graphPruningOnHouseData(inFile):
+  
+  data = parse.parse(inFile)
+
+  unpruned = []
+  pruned = []
+
+  for i in range(20,300,20):
+    withPruning = []
+	withoutPruning = []
+	for j in range(100):
+      random.shuffle(data)
+      train = data[:i]
+      test = data[i:]
+    
+      tree = ID3.ID3(train, 'democrat')
+      acc = ID3.test(tree, test)
+      withoutPruning.append(acc)
+    
+      ID3.prune(tree, test)
+
+      acc = ID3.test(tree, test)
+      withPruning.append(acc)
+
+    pruned.append(sum(withPruning)/len(withPruning))
+    unpruned.append(sum(withoutPruning)/len(withoutPruning))
+
+  num_examples = [i for i in range(20,300,20)]
+  plt.title('Training curve with and without pruning')
+  plt.plot(num_examples, unpruned, label="without pruning")
+  plt.xlabel('Number of training examples')
+  plt.plot(num_examples, pruned, label="with pruning")
+  plt.ylabel('Accuracy on testing set')
+  plt.legend()
+  plt.show()
+ 
+# inFile - string location of the house data file
 def testPruningOnHouseData(inFile):
   withPruning = []
   withoutPruning = []
@@ -101,4 +144,28 @@ def testPruningOnHouseData(inFile):
   print withPruning
   print withoutPruning
   print "average with pruning",sum(withPruning)/len(withPruning)," without: ",sum(withoutPruning)/len(withoutPruning)
+ 
+def breadth_first_search(root):
   
+  '''
+  given the root node, will complete a breadth-first-search on the tree, returning the value of each node in the correct order
+  '''
+  #check if the root is null
+  if root == None:
+    return
+  queue=[]
+  #queue is not empty,push the children of this node into the queue
+  queue.append(root)
+  #check if queue is empty
+  while (queue):
+    children=queue[0].children
+    if children !=None:
+      for key in children:
+        queue.append(children[key])
+    #res=res+str(queue.pop(0).get_value())+' '
+    Node=queue.pop(0)
+    
+    if(Node.label==None):
+      print "no label"
+    else:
+      print Node.label

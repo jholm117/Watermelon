@@ -103,8 +103,7 @@ def prune(node, examples):
 	Takes in a trained tree and a validation set of examples.  Prunes nodes in order
 	to improve accuracy on the validation data; the precise pruning strategy is up to you.
 	'''
-	pruneRecurse(node,node,examples)
-	return
+	return pruneRecurse(node,node,examples)
 	
 	
 	
